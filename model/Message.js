@@ -1,5 +1,6 @@
 const PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
+const db = new PouchDB('./db/messages');
 
 const User = require('./User');
 
@@ -12,29 +13,27 @@ class Message{
     
     static save(message) {
         const p = new Promise((resolve, reject) => {
-            let userRecip;
-            let userDest;
-            
             /* See if exists in the database users with the logins stored in
             the message object */
             User.fetchByLogin(message.userRecipientLogin)
                 .then(result => {
-                    userRecip = result;
+                    if (!result) {
+                        reject(new Error('The login supplied of recipient user doesn\'t exists on the database.'));
+                    }
                     return User.fetchByLogin(message.userDestinationLogin);
                 })
                 .then(result => {
-                    userDest = result
+                    if (!result) {
+                        reject(new Error('The login of supplied of destination user doesn\'t exists on the database.'));
+                    }
                 })
-                .catch(err => reject(err));
-            
-            if (!userRecip || !userDest) {
-                reject(new Error('The login supplied doesn\'t exists on the database.'));
-            }
-
-            /* Saving the message on the database */
-            db.put(message)
-                .then(result => resolve(result))
-                .catch(err => reject(err));       
+                .then(() => {
+                    /* Saving the message on the database */
+                    db.put(message)
+                        .then(result => resolve(result))
+                        .catch(err => reject(err));
+                })
+                .catch(err => reject(err));                   
         });
 
         return p;
