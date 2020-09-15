@@ -5,14 +5,15 @@ const db = new PouchDB('./db/messages');
 const User = require('./User');
 
 class Message{
-    constructor(userRecipientLogin, userDestinationLogin, text) {
-        this._id = (new Date()).toJSON();
+    constructor(userRecipientLogin, userDestinationLogin, text, id = (new Date()).toJSON()) {
+        this._id = id;
         this.userRecipientLogin = userRecipientLogin;
         this.userDestinationLogin = userDestinationLogin;
+        this.text = text;
     }
     
     static save(message) {
-        const p = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             /* See if exists in the database users with the logins stored in
             the message object */
             User.fetchByLogin(message.userRecipientLogin)
@@ -24,7 +25,7 @@ class Message{
                 })
                 .then(result => {
                     if (!result) {
-                        reject(new Error('The login of supplied of destination user doesn\'t exists on the database.'));
+                        reject(new Error('The login supplied of destination user doesn\'t exists on the database.'));
                     }
                 })
                 .then(() => {
@@ -35,8 +36,42 @@ class Message{
                 })
                 .catch(err => reject(err));                   
         });
+    }
 
-        return p;
+    static fetchAllMessagesSendBy(user) {
+        return new Promise((resolve, reject) => {
+            db.find({selector: {userRecipientLogin: user.login}})
+                .then(result => {
+                    resolve(
+                        result.docs.map((messageOfArray) => {
+                            return Message(
+                                messageOfArray.userRecipientLogin, 
+                                messageOfArray.userDestinationLogin,
+                                messageOfArray.text, 
+                                messageOfArray._id
+                            );
+                    }));
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    static fetchAllMessagesReceivedBy(user) {
+        return new Promise((resolve, reject) => {
+            db.find({selector: {userDestinationLogin: user.login}})
+                .then(result => {
+                    resolve(
+                        result.docs.map((messageOfArray) => {
+                            return Message(
+                                messageOfArray.userRecipientLogin, 
+                                messageOfArray.userDestinationLogin,
+                                messageOfArray.text, 
+                                messageOfArray._id
+                            );
+                    }));
+                })
+                .catch(err => reject(err));
+        });
     }
 }
 
