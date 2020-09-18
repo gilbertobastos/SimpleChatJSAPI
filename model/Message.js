@@ -10,6 +10,7 @@ class Message{
         this.userRecipientLogin = userRecipientLogin;
         this.userDestinationLogin = userDestinationLogin;
         this.text = text;
+        this.messageRead = false;
     }
     
     static save(message) {
@@ -56,9 +57,9 @@ class Message{
         });
     }
 
-    static fetchAllMessagesReceivedBy(user) {
+    static fetchAllMessagesForUser(user, onlyUnreadMessages = true) {
         return new Promise((resolve, reject) => {
-            db.find({selector: {userDestinationLogin: user.login}})
+            db.find({selector: {userDestinationLogin: user.login, messageRead: !onlyUnreadMessages}})
                 .then(result => {
                     resolve(
                         result.docs.map((messageOfArray) => {
