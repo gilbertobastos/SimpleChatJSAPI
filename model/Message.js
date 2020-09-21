@@ -39,9 +39,9 @@ class Message{
         });
     }
 
-    static fetchAllMessagesSendBy(user) {
+    static fetchAllMessagesSendBy(userLogin) {
         return new Promise((resolve, reject) => {
-            db.find({selector: {userRecipientLogin: user.login}})
+            db.find({selector: {userRecipientLogin: userLogin}})
                 .then(result => {
                     resolve(
                         result.docs.map((messageOfArray) => {
@@ -57,9 +57,9 @@ class Message{
         });
     }
 
-    static fetchAllMessagesForUser(user, onlyUnreadMessages = true) {
+    static fetchAllMessagesForUser(userLogin, onlyUnreadMessages = true) {
         return new Promise((resolve, reject) => {
-            db.find({selector: {userDestinationLogin: user.login, messageRead: !onlyUnreadMessages}})
+            db.find({selector: {userDestinationLogin: userLogin, messageRead: !onlyUnreadMessages}})
                 .then(result => {
                     resolve(
                         result.docs.map((messageOfArray) => {
