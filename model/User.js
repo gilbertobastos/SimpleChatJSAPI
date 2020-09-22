@@ -22,11 +22,7 @@ class User{
         return new Promise((resolve, reject) => {
             db.find({selector: {login: loginParam}})
                 .then(result => {
-                    if (result.docs.length === 0) {
-                        resolve(undefined);
-                    }
-
-                    let user = new User(result.docs[0].login, result.docs[0].name, result.docs[0]._id);                
+                    const user = result.docs[0];
                     resolve(user);
                 })
                 .catch(err => reject(err));
@@ -37,12 +33,7 @@ class User{
         return new Promise((resolve, reject) => {
             db.allDocs({include_docs: true})
                 .then(result => {
-                    resolve(result.rows.map((userOfArray) => {
-                        return new User(
-                            userOfArray.doc.login, 
-                            userOfArray.doc.name,
-                            userOfArray.doc._id);
-                    }));
+                    resolve(result.rows.map(row => row.doc));
                 })
                 .catch(err => reject(err));
         });

@@ -41,17 +41,9 @@ class Message{
 
     static fetchAllMessagesSendBy(userLogin) {
         return new Promise((resolve, reject) => {
-            db.find({selector: {userRecipientLogin: userLogin}})
+            db.find({include_docs: true, selector: {userRecipientLogin: userLogin}})
                 .then(result => {
-                    resolve(
-                        result.docs.map((messageOfArray) => {
-                            return Message(
-                                messageOfArray.userRecipientLogin, 
-                                messageOfArray.userDestinationLogin,
-                                messageOfArray.text, 
-                                messageOfArray._id
-                            );
-                    }));
+                    resolve(result.docs);
                 })
                 .catch(err => reject(err));
         });
@@ -59,17 +51,9 @@ class Message{
 
     static fetchAllMessagesForUser(userLogin, onlyUnreadMessages = true) {
         return new Promise((resolve, reject) => {
-            db.find({selector: {userDestinationLogin: userLogin, messageRead: !onlyUnreadMessages}})
+            db.find({include_docs: true, selector: {userDestinationLogin: userLogin, messageRead: !onlyUnreadMessages}})
                 .then(result => {
-                    resolve(
-                        result.docs.map((messageOfArray) => {
-                            return Message(
-                                messageOfArray.userRecipientLogin, 
-                                messageOfArray.userDestinationLogin,
-                                messageOfArray.text, 
-                                messageOfArray._id
-                            );
-                    }));
+                    resolve(result.docs);
                 })
                 .catch(err => reject(err));
         });
