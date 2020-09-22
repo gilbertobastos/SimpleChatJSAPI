@@ -1,4 +1,5 @@
 const UserController = require('./controller/UserController');
+const MessageController = require('./controller/MessageController');
 const Express = require('express');
 const bodyParser = require('body-parser');
 const User = require('./model/User');
@@ -12,4 +13,9 @@ app.get('/user/:userLogin', UserController.getUsersInfo);
 app.get('/user/', UserController.getUsersInfo);
 app.post('/user/', UserController.saveUser);
 
-app.listen(3000);
+/* Messages */
+app.get('/user/:userLogin/message/', MessageController.getMessagesForUser);
+app.post('/message/', MessageController.saveMessage);
+
+
+app.listen(3000);   
