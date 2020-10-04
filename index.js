@@ -17,5 +17,4 @@ app.post('/user/', UserController.saveUser);
 app.get('/user/:userLogin/message/', MessageController.getMessagesForUser);
 app.post('/message/', MessageController.saveMessage);
 
-
 app.listen(3000);   

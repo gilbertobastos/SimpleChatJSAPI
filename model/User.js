@@ -10,6 +10,11 @@ class User{
         this.name = name;
     }
 
+    /**
+     * Save a user on the database.
+     *  
+     * @param {User} user The user object.
+     */
     static save(user) {
         return new Promise((resolve, reject) => {
             db.put(user)
@@ -18,6 +23,11 @@ class User{
         });
     }
 
+    /**
+     * Return a object of the user.
+     * 
+     * @param {String} loginParam The login of the user.
+     */
     static fetchByLogin(loginParam) {
         return new Promise((resolve, reject) => {
             db.find({selector: {login: loginParam}})
@@ -28,7 +38,10 @@ class User{
                 .catch(err => reject(err));
         });
     }
-                        
+                      
+    /**
+     * Fetch all users saved on the database.
+     */
     static fetchAll() {
         return new Promise((resolve, reject) => {
             db.allDocs({include_docs: true})
